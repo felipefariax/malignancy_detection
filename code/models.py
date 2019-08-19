@@ -1,14 +1,14 @@
-from keras.applications.nasnet import NASNetMobile
-from keras.layers import Dense, Input, Dropout, Concatenate, GlobalMaxPooling2D, GlobalAveragePooling2D
-from keras.layers import Flatten
-from keras.losses import binary_crossentropy
-from keras.models import Model
-from keras.optimizers import Adam
+from tensorflow.keras.applications.nasnet import NASNetMobile
+from tensorflow.keras.layers import Dense, Input, Dropout, Concatenate, GlobalMaxPooling2D, GlobalAveragePooling2D
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.losses import binary_crossentropy
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 
 def get_model_classif_nasnet():
-    inputs = Input((96, 96, 3))
-    base_model = NASNetMobile(include_top=False, input_shape=(96, 96, 3))#, weights=None
+    inputs = Input((224, 224, 3))
+    base_model = NASNetMobile(include_top=False, input_shape=(224, 224, 3))#, weights=None
     x = base_model(inputs)
     out1 = GlobalMaxPooling2D()(x)
     out2 = GlobalAveragePooling2D()(x)

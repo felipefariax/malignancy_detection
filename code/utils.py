@@ -4,8 +4,29 @@ import cv2
 import imgaug as ia
 import numpy as np  # linear algebra
 from imgaug import augmenters as iaa
-from keras.applications.nasnet import preprocess_input
+from tensorflow.keras.applications.nasnet import preprocess_input
+from PIL import  Image
 import os
+
+def save_as_images(set_name, x, y, mask):
+
+    for i in range(x.shape[0]):
+        if i % 1000 == 0:
+            print(i)
+        label = y[i][0][0][0]
+        folder = os.path.join(set_name, str(label))
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+        filename = os.path.join(folder, str(i)+'.tif')
+
+        im = Image.fromarray(x[i])
+        im.save(filename)
+
+        if mask:
+            np.save(filename.replace('.tif', '_mask.np'), mask[i])
+            # im = Image.fromarray(mask[i])
+
+
 
 
 def get_id_from_file_path(file_path):
@@ -16,6 +37,7 @@ def chunker(seq, size):
 
 
 def get_seq():
+    iaa.Affine()
     sometimes = lambda aug: iaa.Sometimes(0.5, aug)
     seq = iaa.Sequential(
         [
@@ -92,7 +114,7 @@ def data_gen(list_files, id_label_map, batch_size, augment=False):
     while True:
         shuffle(list_files)
         for batch in chunker(list_files, batch_size):
-            X = [cv2.imread(x) for x in batch]
+            X = [cv2.resize(cv2.imread(x), (224, 224)) for x in batch]
             Y = [id_label_map[get_id_from_file_path(x)] for x in batch]
             if augment:
                 X = seq.augment_images(X)
